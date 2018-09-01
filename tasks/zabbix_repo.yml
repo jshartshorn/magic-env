@@ -1,0 +1,28 @@
+---
+- name: Check Zabbix repositories
+  stat: path=/etc/apt/sources.list.d/zabbix.list
+  register: zabbix_repos_list
+  when: ansible_os_family == "Debian" and ansible_distribution_release == "xenial"
+
+- name: Download Zabbix release package
+  get_url:
+    url: "{{zabbix_url}}"
+    dest: "/tmp/zabbix-release.deb"
+  register: zabbix_release_deb
+  when: zabbix_repos_list.stat.exists is defined and zabbix_repos_list.stat.exists == False
+
+- name: Enable Zabbix repositories
+  become: true
+  command: dpkg -i /tmp/zabbix-release.deb
+  register: zabbix_repos
+  when: zabbix_repos_list.stat.exists is defined and zabbix_repos_list.stat.exists == False
+
+- name: Update repositories cache
+  become: true
+  apt: update_cache=yes
+  when: zabbix_repos.changed
+
+- name: Remove Zabbix release package
+  become: true
+  file: path=/tmp/zabbix-release.deb state=absent
+  when: zabbix_release_deb.changed

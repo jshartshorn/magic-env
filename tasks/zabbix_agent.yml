@@ -1,0 +1,17 @@
+---
+- name: Install Zabbix agent
+  become: true
+  apt: name=zabbix-agent
+  with_items:
+        - python-apt
+        - curl
+        - python-httplib2
+
+- name: Configure Zabbix agent
+  become: true
+  template: src=zabbix_agentd.conf.j2 dest=/etc/zabbix/zabbix_agentd.conf
+  notify: zabbix_agent_restart
+
+- name: Enable and start Zabbix agent
+  become: true
+  service: name=zabbix-agent state=started enabled=yes

@@ -1,0 +1,58 @@
+- name: install zabbix-proxy
+  become: true
+  apt: name={{item}}
+  with_items:
+    - python-apt
+    - zabbix-proxy-mysql
+  tags: zabbix-proxy
+
+## setup the proxy db
+- name: Create Zabbix proxy database
+  become: true
+  mysql_db:
+    name: "{{ zabbix_proxy_db_name }}"
+    encoding: 'utf8'
+  when: server_install is defined and server_install.changed
+  notify: mysql_restart
+
+- name: Create Zabbix proxy database user
+  become: true
+  mysql_user:
+    name: "{{ zabbix_proxy_db_username }}"
+    password: "{{ zabbix_proxy_db_password }}"
+    priv: "{{ zabbix_proxy_db_name }}.*:ALL"
+  when: server_install is defined and server_install.changed
+  notify: mysql_restart
+
+- name: Initialize Zabbix proxy database
+  become: true
+  mysql_db:
+    name: "{{ zabbix_proxy_db_name }}"
+    state: import target={{zabbix_proxy_install_sql}}
+  when: server_install is defined and server_install.changed
+  notify: restart zabbix-proxy
+
+- name: set config server
+  become: true
+  lineinfile: dest=/etc/zabbix/zabbix_proxy.conf regexp="^Server=.*" insertafter="^# Server=" line=Server={{ zabbix_server }}
+  notify: restart zabbix-proxy
+  tags: zabbix-proxy
+
+- name: set config serveractive
+  become: true
+  lineinfile: dest=/etc/zabbix/zabbix_proxy.conf regexp="^ServerActive=.*" insertafter="^# ServerActive=" line=ServerActive={{ zabbix_server }}
+  notify: restart zabbix-proxy
+  tags: zabbix-proxy
+
+- name: set config dbfile_path
+  become: true
+  lineinfile: dest=/etc/zabbix/zabbix_proxy.conf regexp="^DBName=.*" insertafter="^# DBName=" line=DBName=/var/lib/zabbix/zabbix.db
+  notify: restart zabbix-proxy
+  tags: zabbix-proxy
+
+- name: mkdir /var/lib/zabbix
+  become: true
+  shell: |
+    mkdir -p /var/lib/zabbix
+    chown zabbix. /var/lib/zabbix
+  tags: zabbix-proxy

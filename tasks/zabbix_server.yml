@@ -1,0 +1,45 @@
+---
+- name: Install Zabbix server
+  become: true
+  apt: name=zabbix-server-mysql
+  when: ansible_os_family == "Debian" and ansible_distribution_release == "xenial"
+  register: server_install
+
+- name: Create Zabbix database
+  become: true
+  mysql_db:
+    name: "{{ zabbix_db_name }}"
+    encoding: 'utf8'
+  when: server_install is defined and server_install.changed
+  notify:
+    - mysql_restart
+
+- name: Create Zabbix database user
+  become: true
+  mysql_user:
+    name: "{{ zabbix_db_username }}"
+    password: "{{ zabbix_db_password }}"
+    priv: "{{ zabbix_db_name }}.*:ALL"
+  when: server_install is defined and server_install.changed
+  notify:
+    - mysql_restart
+
+- name: Initialize Zabbix database
+  become: true
+  mysql_db:
+    name: "{{ zabbix_db_name }}"
+    state: import target=/usr/share/doc/zabbix-server-mysql/create.sql.gz
+  when: server_install is defined and server_install.changed
+  notify:
+  - zabbix_server_start
+
+- name: Configure Zabbix server
+  become: true
+  template: src=zabbix_server.conf.j2 dest=/etc/zabbix/zabbix_server.conf mode=640
+  notify:
+  - zabbix_server_restart
+
+- name: Start Zabbix server
+  become: true
+  service: name=zabbix-server state=started enabled=yes
+  when: server_install is defined and server_install.changed

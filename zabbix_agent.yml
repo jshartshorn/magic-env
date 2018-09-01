@@ -1,0 +1,10 @@
+---
+- name: Install and configure Zabbix server
+  hosts: zabbix_agents
+
+  tasks:
+    - include: tasks/zabbix_repo.yml
+    - include: tasks/zabbix_agent.yml
+
+  handlers:
+    - include: handlers/zabbix_service.yml

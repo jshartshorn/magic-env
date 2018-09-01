@@ -1,0 +1,11 @@
+[zabbix_servers]
+zserverp
+
+[zabbix_proxy]
+zproxyp
+
+[zabbix_agents]
+zagentp
+#zserver
+#za1
+#za2

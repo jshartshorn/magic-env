@@ -1,0 +1,12 @@
+---
+- name: Install Zabbix web interface
+  become: true
+  apt: name=zabbix-frontend-php
+  notify:
+    - apache_restart
+
+- name: Configure Zabbix web interface
+  become: true
+  template: src=apache.conf.j2 dest=/etc/zabbix/apache.conf owner=root group=www-data mode=0640
+  notify:
+    - apache_restart

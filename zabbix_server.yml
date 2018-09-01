@@ -1,0 +1,15 @@
+---
+- name: Install and configure Zabbix server
+  hosts: zabbix_servers
+
+  tasks:
+    - include: tasks/mysql_server.yml
+
+    - include: tasks/zabbix_repo.yml
+    - include: tasks/zabbix_server.yml
+    - include: tasks/zabbix_web.yml
+
+  handlers:
+    - include: handlers/apache_service.yml
+    - include: handlers/mysql_service.yml
+    - include: handlers/zabbix_service.yml

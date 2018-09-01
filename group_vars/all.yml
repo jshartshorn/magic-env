@@ -1,0 +1,12 @@
+## zabbix server vars
+zabbix_server_ip: 192.168.250.10
+zabbix_server: zserverp
+
+os_release: xenial
+
+## zabbix repo url
+# zabbix_url: "http://repo.zabbix.com/zabbix/3.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.4-1+trusty_all.deb"
+zabbix_url: "http://repo.zabbix.com/zabbix/3.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.4-1+xenial_all.deb"
+
+## var for proxy shell command
+hostname_cmd: hostname
