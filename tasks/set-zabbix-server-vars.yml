@@ -1,0 +1,68 @@
+---
+- name: include secrets file
+  include_vars:
+    dir: ../secrets
+    extensions:
+      - yml
+  tags: set_host_env_vars
+
+- set_fact:
+    env_content: "{{ lookup('template', 'env.j2') }}"
+
+- name: set host env vars
+  become: true
+  blockinfile:
+    dest: /etc/environment
+    marker: "{mark} ## MagicAI env vars"
+    content: '{{ env_content }}'
+    state: present
+  tags: set_host_env_vars
+
+- name: debug key var
+  debug: msg="{{ aws_access_key_id }}"
+
+# - name: set aws_access_key_id with shell
+#   become: true
+#   shell: "AWS_ACCESS_KEY_ID=auto"
+#   environment:
+#     AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+#
+
+# - name: set aws_access_key_id with export
+#   become: true
+#   shell: export AWS_ACCESS_KEY_ID="auto"
+#   environment:
+#     AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+
+# - name: set aws_access_key_id with lineinfile
+#   become: true
+#   lineinfile:
+#      path=/etc/environment
+#      state=present
+#      regexp='^AWS_ACCESS_KEY_ID'
+#      line='AWS_ACCESS_KEY_ID={{ aws_access_key_id }}'
+#   tags: set_host_env_vars
+#
+
+
+
+   #regexp='=(AWS_ACCESS_KEY_ID=(["]*)((?!.*?{{ aws_access_key_id }}).*?)(["]*)$'
+   #line="AWS_ACCESS_KEY_ID=\1\2:{{ aws_access_key_id }}\3"
+
+   #   lineinfile: >
+   # dest=/etc/environment
+   # state=present
+   # backrefs=yes
+   # regexp='PATH=(["]*)((?!.*?{{extra_path}}).*?)(["]*)$'
+   # line="PATH=\1\2:{{extra_path}}\3"
+
+## testing
+# - name: echo aws_access_key_id
+#   become: true
+#   shell: echo $AWS_ACCESS_KEY_ID
+#   environment:
+#     AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+
+- name: echo aws_access_key_id post set
+  become: true
+  shell: echo $AWS_ACCESS_KEY_ID

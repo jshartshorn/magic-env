@@ -1,0 +1,6 @@
+---
+- name: set zabbix server env vars
+  hosts: zabbix_servers
+
+  tasks:
+    - include: tasks/set-zabbix-server-vars.yml
