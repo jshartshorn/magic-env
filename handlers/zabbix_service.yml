@@ -1,9 +1,0 @@
----
-- name: zabbix_server_start
-  service: name=zabbix-server state=started
-
-- name: zabbix_server_restart
-  service: name=zabbix-server state=restarted
-
-- name: zabbix_agent_restart
-  service: name=zabbix-agent state=restarted

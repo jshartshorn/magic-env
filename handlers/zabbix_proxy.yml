@@ -1,4 +1,0 @@
-- name: restart zabbix-proxy
-  become: true
-  service: name=zabbix-proxy state=restarted sleep=3 enabled=yes
-  tags: zabbix-proxy

@@ -1,6 +1,0 @@
-## enable params for general zabbix server vars
-
-zabbix_db_host: zserverp
-zabbix_db_name: zabbix
-zabbix_db_password: zabbix
-zabbix_db_username: zabbix
